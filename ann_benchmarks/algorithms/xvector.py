@@ -5,9 +5,13 @@ from psycopg.pq import Format
 import numpy as np
 from struct import pack, unpack
 
+from .base import BaseANN
 
-class XVector:
-    def __init__(self):
+
+class XVector(BaseANN):
+    def __init__(self, metric):
+        self._metric = metric
+        self._ef = 400
         self._cur = None
         self._query = "SELECT id FROM items ORDER BY vector <?> %s LIMIT %s"
 
@@ -102,14 +106,17 @@ class XVector:
             for i, embedding in enumerate(X):
                 copy.write_row((i, embedding))        
         print("Building index...")
-        cur.execute("CREATE INDEX IF NOT EXISTS items_hnsw_idx ON items USING xvector_hnsw(vector) WITH(dim=5)")
+        cur.execute("CREATE INDEX IF NOT EXISTS items_hnsw_idx ON items USING xvector_hnsw(vector) WITH(dim=%s)", (X.shape[0],))
         self._cur = cur
 
-    def set_query_arguments(self):
+    def set_query_arguments(self, ef):
         self._cur.execute("SET work_mem = '256MB'")
         self._cur.execute("SET max_parallel_workers_per_gather = 0")
+        print(ef)
+        self._ef = ef
 
     def query(self, v, n):
+        #p1 = v + ":" + str(self._ef)
         self._cur.execute(self._query, (v, n), binary=True, prepare=True)
         return [id for id, in self._cur.fetchall()]
 

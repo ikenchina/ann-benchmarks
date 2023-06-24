@@ -639,6 +639,16 @@ float:
           args: [[100, 200, 400, 1000, 2000, 4000]]
           query-args: [[1, 2, 4, 10, 20, 40, 100]]
 
+    xvector:
+      docker-tag: ann-benchmarks-xvector
+      module: ann_benchmarks.algorithms.xvector
+      constructor: XVector
+      base-args: ["@metric"]
+      run-groups:
+        Xvector:
+          args: []
+          query-args: [[4, 8, 16, 32, 64]]
+
     redisearch:
       docker-tag: ann-benchmarks-redisearch
       module: ann_benchmarks.algorithms.redisearch
