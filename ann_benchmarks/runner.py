@@ -5,7 +5,7 @@ import os
 import threading
 import time
 import traceback
-
+import datetime
 import colors
 import docker
 import numpy
@@ -44,7 +44,9 @@ def run_individual_query(algo, X_train, X_test, distance, count, run_count, batc
             ]
             n_items_processed[0] += 1
             if n_items_processed[0] % 1000 == 0:
-                print("Processed %d/%d queries..." % (n_items_processed[0], len(X_test)))
+                now = datetime.datetime.now()
+                time_str = now.strftime("%Y-%m-%d %H:%M:%S")
+                print("Processed [%s] %d/%d queries..." % (time_str, n_items_processed[0], len(X_test)))
             if len(candidates) > count:
                 print(
                     "warning: algorithm %s returned %d results, but count"

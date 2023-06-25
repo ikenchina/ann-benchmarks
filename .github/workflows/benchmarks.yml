@@ -45,6 +45,7 @@ jobs:
           - nmslib
           - opensearchknn
           - pgvector
+          - xvector
           - pynndescent
           - redisearch
           - qdrant

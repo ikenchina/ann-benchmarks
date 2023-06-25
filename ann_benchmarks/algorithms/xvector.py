@@ -1,4 +1,6 @@
 import psycopg
+import subprocess
+import sys
 from psycopg.types import TypeInfo
 from psycopg.adapt import Loader, Dumper
 from psycopg.pq import Format
@@ -94,6 +96,7 @@ class XVector(BaseANN):
         self.register_vector_info(context, info)
 
     def fit(self, X):
+        #subprocess.run("service postgresql start", shell=True, check=True, stdout=sys.stdout, stderr=sys.stderr)
         conn = psycopg.connect(user="ann", password="ann", dbname="ann", host="localhost")
         self.register_vector(conn)
 
@@ -106,7 +109,8 @@ class XVector(BaseANN):
             for i, embedding in enumerate(X):
                 copy.write_row((i, embedding))        
         print("Building index...")
-        cur.execute("CREATE INDEX IF NOT EXISTS items_hnsw_idx ON items USING xvector_hnsw(vector) WITH(dim=%s)", (X.shape[0],))
+        dim=X.shape[1]
+        cur.execute(f"CREATE INDEX IF NOT EXISTS items_hnsw_idx ON items USING xvector_hnsw(vector) WITH(dim={dim})")
         self._cur = cur
 
     def set_query_arguments(self, ef):
@@ -116,7 +120,6 @@ class XVector(BaseANN):
         self._ef = ef
 
     def query(self, v, n):
-        #p1 = v + ":" + str(self._ef)
         self._cur.execute(self._query, (v, n), binary=True, prepare=True)
         return [id for id, in self._cur.fetchall()]
 
