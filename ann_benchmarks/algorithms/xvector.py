@@ -1,6 +1,7 @@
 import psycopg
 import subprocess
 import sys
+
 from psycopg.types import TypeInfo
 from psycopg.adapt import Loader, Dumper
 from psycopg.pq import Format
@@ -96,7 +97,7 @@ class XVector(BaseANN):
         self.register_vector_info(context, info)
 
     def fit(self, X):
-        #subprocess.run("service postgresql start", shell=True, check=True, stdout=sys.stdout, stderr=sys.stderr)
+        subprocess.run("service postgresql start", shell=True, check=True, stdout=sys.stdout, stderr=sys.stderr)
         conn = psycopg.connect(user="ann", password="ann", dbname="ann", host="localhost")
         self.register_vector(conn)
 
@@ -116,7 +117,6 @@ class XVector(BaseANN):
     def set_query_arguments(self, ef):
         self._cur.execute("SET work_mem = '256MB'")
         self._cur.execute("SET max_parallel_workers_per_gather = 0")
-        print(ef)
         self._ef = ef
 
     def query(self, v, n):
@@ -125,4 +125,3 @@ class XVector(BaseANN):
 
     def __str__(self):
         return "XVector"
-
