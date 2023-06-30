@@ -6,7 +6,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get -y install tzdata
 RUN apt-get install -y libomp-dev
 RUN apt-get update && apt-get install -y --no-install-recommends build-essential postgresql postgresql-server-dev-all
 RUN sh -c 'echo "local all all trust" > /etc/postgresql/14/main/pg_hba.conf'
-RUN sh -C 'echo "host all all 127.0.0.1/32 trust" >> /etc/postgresql/14/main/pg_hba.conf'
+RUN sh -c 'echo "host all all 127.0.0.1/32 trust" >> /etc/postgresql/14/main/pg_hba.conf'
 RUN cd /tmp/xvector && \
 	make clean && \
 	make USE_PGXS=1 && \
