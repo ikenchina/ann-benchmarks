@@ -21,7 +21,7 @@ class PGVector(BaseANN):
             raise RuntimeError(f"unknown metric {metric}")
 
     def fit(self, X):
-        #subprocess.run("service postgresql start", shell=True, check=True, stdout=sys.stdout, stderr=sys.stderr)
+        subprocess.run("service postgresql start", shell=True, check=True, stdout=sys.stdout, stderr=sys.stderr)
         conn = psycopg.connect(user="ann", password="ann", dbname="ann", host="localhost")
         pgvector.psycopg.register_vector(conn)
         cur = conn.cursor()
