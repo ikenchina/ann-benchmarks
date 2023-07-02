@@ -1,6 +1,8 @@
 import psycopg
 import subprocess
 import sys
+from datetime import datetime
+
 
 from psycopg.types import TypeInfo
 from psycopg.adapt import Loader, Dumper
@@ -10,13 +12,23 @@ from struct import pack, unpack
 
 from .base import BaseANN
 
+def now():
+    now = datetime.now()
+    current_date_time = now.strftime("%Y-%m-%d %H:%M:%S")
+    return current_date_time
 
 class XVector(BaseANN):
-    def __init__(self, metric):
+    def __init__(self, metric, x):
         self._metric = metric
-        self._ef = 400
+        self._ef = 10
         self._cur = None
-        self._query = "SELECT id FROM items ORDER BY vector <?> %s LIMIT %s"
+        self._ef_build = x["efConstruction"]
+        self._M = x["M"]
+        if metric == "angular":
+            self._query = "SELECT id FROM items ORDER BY vector <?> xvector(%s::float4[],%s,1) LIMIT %s"
+        elif metric == "euclidean":
+            self._query = "SELECT id FROM items ORDER BY vector <?> xvector(%s::float4[],%s,0) LIMIT %s"
+        print("query constructor : {self._query}")
 
     @staticmethod
     def from_db(value):
@@ -97,21 +109,42 @@ class XVector(BaseANN):
         self.register_vector_info(context, info)
 
     def fit(self, X):
-        subprocess.run("service postgresql start", shell=True, check=True, stdout=sys.stdout, stderr=sys.stderr)
+        #subprocess.run("service postgresql start", shell=True, check=True, stdout=sys.stdout, stderr=sys.stderr)
         conn = psycopg.connect(user="ann", password="ann", dbname="ann", host="localhost")
         self.register_vector(conn)
 
         cur = conn.cursor()
+        cur.execute("DROP TABLE IF EXISTS items")
         cur.execute("CREATE TABLE IF NOT EXISTS items (id int, vector float4[])")
         cur.execute("ALTER TABLE items ALTER COLUMN vector SET STORAGE PLAIN")
-        print("Copying vector data...")
-        # Building index later is faster 
-        with cur.copy("COPY items (id, vector) FROM STDIN") as copy:
-            for i, embedding in enumerate(X):
-                copy.write_row((i, embedding))        
-        print("Building index...")
         dim=X.shape[1]
-        cur.execute(f"CREATE INDEX IF NOT EXISTS items_hnsw_idx ON items USING xvector_hnsw(vector) WITH(dim={dim})")
+        cur.execute(f"CREATE INDEX IF NOT EXISTS items_hnsw_idx ON items USING xvector_hnsw(vector) WITH(dim={dim},ef_build={self._ef_build},base_nb_num={self._M})")
+        
+        #conn.commit()
+
+        print(now() + " Copying vector data...")
+        # Building index later is faster 
+
+        len=X.shape[0]
+        step=10000
+        x=0
+        while x < len:
+            y=x+step
+            if y > len:
+                y=len
+            try:
+                print(now() + f" copy from {x} to {y}")
+                with cur.copy("COPY items (id, vector) FROM STDIN") as copy:
+                    for i, embedding in enumerate(X[x:y]):
+                        copy.write_row((i, embedding))
+                #conn.commit()        
+            except Exception as e:
+                print(e)
+            x=y
+        
+        #conn.commit()
+        #cur.close()
+        #cur = conn.cursor()
         self._cur = cur
 
     def set_query_arguments(self, ef):
@@ -120,7 +153,8 @@ class XVector(BaseANN):
         self._ef = ef
 
     def query(self, v, n):
-        self._cur.execute(self._query, (v, n), binary=True, prepare=True)
+        params=v.tolist()
+        self._cur.execute(self._query, (params, self._ef, n), binary=True, prepare=True)
         return [id for id, in self._cur.fetchall()]
 
     def __str__(self):

@@ -645,9 +645,35 @@ float:
       constructor: XVector
       base-args: ["@metric"]
       run-groups:
-        Xvector:
-          args: []
-          query-args: [[4, 8, 16, 32, 64]]
+        M-8:
+          arg-groups:
+            - {"M": 8,  "efConstruction": 80}
+          query-args: [[10, 20, 40, 80, 120, 200]]
+        M-12:
+          arg-groups:
+            - {"M": 12,  "efConstruction": 80}
+          query-args: [[10, 20, 40, 80, 120, 200]]
+        M-16:
+          arg-groups:
+            - {"M": 16,  "efConstruction": 80}
+          query-args: [[10, 20, 40, 80, 120, 200]]
+        M-24:
+          arg-groups:
+            - {"M": 24,  "efConstruction": 80}
+          query-args: [[10, 20, 40, 80, 120, 200]]
+        M-36:
+          arg-groups:
+            - {"M": 36,  "efConstruction": 80}
+          query-args: [[10, 20, 40, 80, 120, 200]]
+        M-48:
+          arg-groups:
+            - {"M": 48,  "efConstruction": 80}
+          query-args: [[10, 20, 40, 80, 120, 200]]
+        M-64:
+          arg-groups:
+            - {"M": 64,  "efConstruction": 80}
+          query-args: [[10, 20, 40, 80, 120, 200]]
+
 
     redisearch:
       docker-tag: ann-benchmarks-redisearch

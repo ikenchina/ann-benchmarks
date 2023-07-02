@@ -1,6 +1,6 @@
 FROM ann-benchmarks
 
-RUN git clone https://github.com/ikenchina/xvector /tmp/xvector
+RUN git clone https://gitee.com/ikenchina/xvector /tmp/xvector
 
 RUN DEBIAN_FRONTEND=noninteractive apt-get -y install tzdata
 RUN apt-get install -y libomp-dev
