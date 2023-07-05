@@ -645,34 +645,14 @@ float:
       constructor: XVector
       base-args: ["@metric"]
       run-groups:
-        M-8:
-          arg-groups:
-            - {"M": 8,  "efConstruction": 80}
-          query-args: [[10, 20, 40, 80, 120, 200]]
-        M-12:
-          arg-groups:
-            - {"M": 12,  "efConstruction": 80}
-          query-args: [[10, 20, 40, 80, 120, 200]]
         M-16:
           arg-groups:
-            - {"M": 16,  "efConstruction": 80}
-          query-args: [[10, 20, 40, 80, 120, 200]]
-        M-24:
+            - {"M": 16,  "efConstruction": 40}
+          query-args: [[10, 40, 80]]
+        M-30:
           arg-groups:
-            - {"M": 24,  "efConstruction": 80}
-          query-args: [[10, 20, 40, 80, 120, 200]]
-        M-36:
-          arg-groups:
-            - {"M": 36,  "efConstruction": 80}
-          query-args: [[10, 20, 40, 80, 120, 200]]
-        M-48:
-          arg-groups:
-            - {"M": 48,  "efConstruction": 80}
-          query-args: [[10, 20, 40, 80, 120, 200]]
-        M-64:
-          arg-groups:
-            - {"M": 64,  "efConstruction": 80}
-          query-args: [[10, 20, 40, 80, 120, 200]]
+            - {"M": 30,  "efConstruction": 80}
+          query-args: [[10, 40, 80, 140, 200]]
 
 
     redisearch:

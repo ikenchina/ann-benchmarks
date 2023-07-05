@@ -25,7 +25,7 @@ class XVector(BaseANN):
         self._ef_build = x["efConstruction"]
         self._M = x["M"]
         if metric == "angular":
-            self._query = "SELECT id FROM items ORDER BY vector <?> xvector(%s::float4[],%s,1) LIMIT %s"
+            self._query = "SELECT id FROM items ORDER BY vector <?> xvector(%s::float4[],%s,2) LIMIT %s"
         elif metric == "euclidean":
             self._query = "SELECT id FROM items ORDER BY vector <?> xvector(%s::float4[],%s,0) LIMIT %s"
         print("query constructor : {self._query}")
@@ -119,7 +119,7 @@ class XVector(BaseANN):
         cur.execute("ALTER TABLE items ALTER COLUMN vector SET STORAGE PLAIN")
         dim=X.shape[1]
         cur.execute(f"CREATE INDEX IF NOT EXISTS items_hnsw_idx ON items USING xvector_hnsw(vector) WITH(dim={dim},ef_build={self._ef_build},base_nb_num={self._M})")
-        
+        print(f"CREATE INDEX IF NOT EXISTS items_hnsw_idx ON items USING xvector_hnsw(vector) WITH(dim={dim},ef_build={self._ef_build},base_nb_num={self._M})")
         #conn.commit()
 
         print(now() + " Copying vector data...")
