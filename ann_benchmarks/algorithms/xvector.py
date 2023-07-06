@@ -64,7 +64,7 @@ class XVector(BaseANN):
         value = np.asarray(value, dtype='>f')
         if value.ndim != 1:
             raise ValueError('expected ndim to be 1')
-        return pack('>LLL', value.shape[0], 0, 0) + value.tobytes()
+        return pack('>LLL', value.shape[1], 0, 0) + value.tobytes()
 
     class VectorDumper(Dumper):
         format = Format.TEXT
@@ -115,16 +115,21 @@ class XVector(BaseANN):
 
         cur = conn.cursor()
         cur.execute("DROP TABLE IF EXISTS items")
+        cur.execute("DROP INDEX IF EXISTS items_hnsw_idx")
         cur.execute("CREATE TABLE IF NOT EXISTS items (id int, vector float4[])")
         cur.execute("ALTER TABLE items ALTER COLUMN vector SET STORAGE PLAIN")
         dim=X.shape[1]
+
+        print(now() + f" CREATE INDEX IF NOT EXISTS items_hnsw_idx ON items USING xvector_hnsw(vector) WITH(dim={dim},ef_build={self._ef_build},base_nb_num={self._M})")
         cur.execute(f"CREATE INDEX IF NOT EXISTS items_hnsw_idx ON items USING xvector_hnsw(vector) WITH(dim={dim},ef_build={self._ef_build},base_nb_num={self._M})")
-        print(f"CREATE INDEX IF NOT EXISTS items_hnsw_idx ON items USING xvector_hnsw(vector) WITH(dim={dim},ef_build={self._ef_build},base_nb_num={self._M})")
-        #conn.commit()
 
         print(now() + " Copying vector data...")
-        # Building index later is faster 
 
+        # with cur.copy("COPY items (id, vector) FROM STDIN") as copy:
+        #     for i, embedding in enumerate(X):
+        #         copy.write_row((i, embedding))
+
+        # Building index later is faster 
         len=X.shape[0]
         step=10000
         x=0
@@ -136,8 +141,7 @@ class XVector(BaseANN):
                 print(now() + f" copy from {x} to {y}")
                 with cur.copy("COPY items (id, vector) FROM STDIN") as copy:
                     for i, embedding in enumerate(X[x:y]):
-                        copy.write_row((i, embedding))
-                #conn.commit()        
+                        copy.write_row((x+i, embedding))
             except Exception as e:
                 print(e)
             x=y
@@ -148,6 +152,7 @@ class XVector(BaseANN):
         self._cur = cur
 
     def set_query_arguments(self, ef):
+        print(now() + f" set query argu : {ef}")
         self._cur.execute("SET work_mem = '256MB'")
         self._cur.execute("SET max_parallel_workers_per_gather = 0")
         self._ef = ef
