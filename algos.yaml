@@ -636,8 +636,29 @@ float:
       base-args: ["@metric"]
       run-groups:
         pgvector:
-          args: [[102]]
-          query-args: [[1]]
+          args: [[100, 200, 400, 1000, 2000, 4000]]
+          query-args: [[1, 2, 4, 10, 20, 40, 100]]
+
+    xvector_hnsw:
+      docker-tag: ann-benchmarks-xvector_hnsw
+      module: ann_benchmarks.algorithms.xvector_hnsw
+      constructor: XVectorHnsw
+      base-args: ["@metric"]
+      run-groups:
+        empty:
+          args: []
+
+    xvector_ivfflat:
+      docker-tag: ann-benchmarks-xvector
+      module: ann_benchmarks.algorithms.xvector_ivfflat
+      constructor: XVectorIvf
+      base-args: ["@metric"]
+      run-groups:
+        xvector:
+          args: [[100, 200, 400, 1000, 2000, 400]]
+          query-args: [[1, 2, 4, 10, 20, 40, 100]]
+          # args: [[100, 200, 400, 1000, 2000, 4000]]
+          # query-args: [[10, 20, 40, 100, 200, 400, 1000]]
 
     xvector:
       docker-tag: ann-benchmarks-xvector
@@ -645,18 +666,49 @@ float:
       constructor: XVector
       base-args: ["@metric"]
       run-groups:
-        M-16:
+        M-6:
           arg-groups:
-            - {"M": 16,  "efConstruction": 50}
-          query-args: [[20, 40, 60, 100]]
+            - {"M": 6,  "efConstruction": 300}
+          query-args: [[10, 20, 30, 40, 50]]
+        M-8:
+          arg-groups:
+            - {"M": 8,  "efConstruction": 300}
+          query-args: [[10, 20, 30, 40, 50]]
+        M-10:
+          arg-groups:
+            - {"M": 10,  "efConstruction": 300}
+          query-args: [[10, 20, 30, 40, 50, 100, 150, 200, 300]]
+        M-15:
+          arg-groups:
+            - {"M": 15,  "efConstruction": 300}
+          query-args: [[10, 20, 30, 40, 50, 80, 100, 150, 200]]
+        M-20:
+          arg-groups:
+            - {"M": 20,  "efConstruction": 300}
+          query-args: [[10, 20, 30, 40, 50, 80, 100, 150, 200]]
+        M-25:
+          arg-groups:
+            - {"M": 25,  "efConstruction": 300}
+          query-args: [[10, 20, 30, 40, 50, 80, 100, 150, 200]]
         M-30:
           arg-groups:
-            - {"M": 30,  "efConstruction": 100}
-          query-args: [[20, 60, 100, 200]]
+            - {"M": 30,  "efConstruction": 300}
+          query-args: [[10, 20, 30, 40, 50]]
         M-40:
           arg-groups:
-            - {"M": 40,  "efConstruction": 200}
-          query-args: [[10, 20, 30, 60, 80, 100]]
+            - {"M": 40,  "efConstruction": 300}
+          query-args: [[10, 20, 30, 40, 50, 100, 150]]
+        M-50:
+          arg-groups:
+            - {"M": 50,  "efConstruction": 300}
+          query-args: [[10, 20, 30, 40, 50, 100, 150]]
+        M-60:
+          arg-groups:
+            - {"M": 60,  "efConstruction": 300}
+          query-args: [[10, 20, 30, 40, 50, 100, 150]]
+
+
+
 
     redisearch:
       docker-tag: ann-benchmarks-redisearch
