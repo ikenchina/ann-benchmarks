@@ -13,9 +13,11 @@ from .base import BaseANN
 
 
 class XVectorHnsw(BaseANN):
-    def __init__(self, metric):
+    def __init__(self, metric, x):
         self._metric = metric
         self._cur = None
+        self._ef_build = x["efConstruction"]
+        self._M = x["M"]
 
         if metric == "angular":
             self._query = "SELECT id FROM items ORDER BY embedding <=> %s LIMIT %s"
@@ -132,9 +134,9 @@ class XVectorHnsw(BaseANN):
         print("creating index...")
         
         if self._metric == "angular":
-            cur.execute("CREATE INDEX ON items USING hnsw (embedding xvector_hnsw_cosine_ops) WITH (dims=%d,maxelements=1201000)" % dim)
+            cur.execute(f"CREATE INDEX ON items USING hnsw (embedding xvector_hnsw_cosine_ops) WITH (dims={dim},maxelements=1201000,m={self._M},efconstruction={self._ef_build})")
         elif self._metric == "euclidean":
-            cur.execute("CREATE INDEX ON items USING hnsw (embedding xvector_hnsw_l2_ops) WITH (dims=%d,maxelements=1201000)" % dim)
+            cur.execute(f"CREATE INDEX ON items USING hnsw (embedding xvector_hnsw_l2_ops) WITH (dims={dim},maxelements=1201000,m={self._M},efconstruction={self._ef_build})")
         else:
             raise RuntimeError(f"unknown metric {self._metric}")
         
@@ -146,10 +148,11 @@ class XVectorHnsw(BaseANN):
         print("done!")
         self._cur = cur
 
-    def set_query_arguments(self):
+    def set_query_arguments(self, efsearch):
         # TODO set based on available memory
         # self._cur.execute("SET work_mem = '256MB'")
         # disable parallel query execution
+        self._cur.execute("SET hnsw.efsearch = %d" % efsearch)
         self._cur.execute("SET max_parallel_workers_per_gather = 0")
 
     def query(self, v, n):
