@@ -120,7 +120,7 @@ class XVectorHnsw(BaseANN):
 
 
     def fit(self, X):
-        #subprocess.run("service postgresql start", shell=True, check=True, stdout=sys.stdout, stderr=sys.stderr)
+        subprocess.run("service postgresql start", shell=True, check=True, stdout=sys.stdout, stderr=sys.stderr)
         conn = psycopg.connect(user="ann", password="ann", dbname="ann", host="localhost")
         self.register_vector(conn)
         dim=X.shape[1]
@@ -128,15 +128,16 @@ class XVectorHnsw(BaseANN):
         cur.execute("SELECT pg_backend_pid()")
         fe=cur.fetchone()
         print(fe)
+        rsize=X.shape[0]+100
 
         cur.execute("CREATE TABLE items (id int, embedding xvector(%d))" % dim)
         cur.execute("ALTER TABLE items ALTER COLUMN embedding SET STORAGE PLAIN")
         print("creating index...")
         
         if self._metric == "angular":
-            cur.execute(f"CREATE INDEX ON items USING hnsw (embedding xvector_hnsw_cosine_ops) WITH (dims={dim},maxelements=1201000,m={self._M},efconstruction={self._ef_build})")
+            cur.execute(f"CREATE INDEX ON items USING hnsw (embedding hnsw_cosine_ops) WITH (dims={dim},maxsize=0,maxelements={rsize},m={self._M},efconstruction={self._ef_build})")
         elif self._metric == "euclidean":
-            cur.execute(f"CREATE INDEX ON items USING hnsw (embedding xvector_hnsw_l2_ops) WITH (dims={dim},maxelements=1201000,m={self._M},efconstruction={self._ef_build})")
+            cur.execute(f"CREATE INDEX ON items USING hnsw (embedding hnsw_l2_ops) WITH (dims={dim},maxsize=0,maxelements={rsize},m={self._M},efconstruction={self._ef_build})")
         else:
             raise RuntimeError(f"unknown metric {self._metric}")
         

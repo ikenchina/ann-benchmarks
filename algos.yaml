@@ -648,15 +648,15 @@ float:
         M-50:
           arg-groups:
             - {"M": 50,  "efConstruction": 20}
-          query-args: [[40, 50, 100, 150]]
+          query-args: [[50, 100, 150]]
         M-100:
           arg-groups:
             - {"M": 100,  "efConstruction": 50}
-          query-args: [[40, 50, 100, 150]]
+          query-args: [[50, 100, 150]]
         M-150:
           arg-groups:
             - {"M": 150,  "efConstruction": 80}
-          query-args: [[40, 50, 100, 150]]
+          query-args: [[50, 100, 150]]
 
     xvector_ivfflat:
       docker-tag: ann-benchmarks-xvector
