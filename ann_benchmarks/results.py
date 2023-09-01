@@ -45,8 +45,6 @@ def load_all_results(dataset=None, count=None, batch_mode=False):
             try:
                 f = h5py.File(os.path.join(root, fn), "r+")
                 properties = dict(f.attrs)
-                # properties["algo"]=properties["algo"]+fn[10:12]
-                # properties["name"]=properties["name"]+fn[10:12]
                 if batch_mode != properties["batch_mode"]:
                     continue
                 yield properties, f

@@ -125,9 +125,6 @@ class XVectorHnsw(BaseANN):
         self.register_vector(conn)
         dim=X.shape[1]
         cur = conn.cursor()
-        cur.execute("SELECT pg_backend_pid()")
-        fe=cur.fetchone()
-        print(fe)
         rsize=X.shape[0]+100
 
         cur.execute("CREATE TABLE items (id int, embedding xvector(%d))" % dim)

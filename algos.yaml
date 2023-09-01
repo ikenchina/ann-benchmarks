@@ -639,12 +639,43 @@ float:
           args: [[100, 200, 400, 1000, 2000, 4000]]
           query-args: [[1, 2, 4, 10, 20, 40, 100]]
 
+    pgvector_hnsw:
+      docker-tag: ann-benchmarks-pgvector_hnsw
+      module: ann_benchmarks.algorithms.pgvector_hnsw
+      constructor: PGVectorHnsw
+      base-args: ["@metric"]
+      run-groups:
+        M-8:
+          arg-groups:
+            - {"M": 8,  "efConstruction": 32}
+          query-args: [[10, 30, 80]]
+        M-16:
+          arg-groups:
+            - {"M": 16,  "efConstruction": 64}
+          query-args: [[50, 100, 150]]
+        M-32:
+          arg-groups:
+            - {"M": 32,  "efConstruction": 64}
+          query-args: [[50, 100, 150]]
+        M-33:
+          arg-groups:
+            - {"M": 33,  "efConstruction": 100}
+          query-args: [[50, 100, 150]]
+
     xvector_hnsw:
       docker-tag: ann-benchmarks-xvector_hnsw
       module: ann_benchmarks.algorithms.xvector_hnsw
       constructor: XVectorHnsw
       base-args: ["@metric"]
       run-groups:
+        M-8:
+          arg-groups:
+            - {"M": 8,  "efConstruction": 15}
+          query-args: [[10, 30, 60]]
+        M-10:
+          arg-groups:
+            - {"M": 10,  "efConstruction": 20}
+          query-args: [[20, 50, 100]]
         M-50:
           arg-groups:
             - {"M": 50,  "efConstruction": 20}
@@ -653,19 +684,19 @@ float:
           arg-groups:
             - {"M": 100,  "efConstruction": 50}
           query-args: [[50, 100, 150]]
-        M-150:
-          arg-groups:
-            - {"M": 150,  "efConstruction": 80}
-          query-args: [[50, 100, 150]]
+        # M-150:
+        #   arg-groups:
+        #     - {"M": 150,  "efConstruction": 80}
+        #   query-args: [[50, 100, 150]]
 
     xvector_ivfflat:
-      docker-tag: ann-benchmarks-xvector
+      docker-tag: ann-benchmarks-xvector-ivf
       module: ann_benchmarks.algorithms.xvector_ivfflat
-      constructor: XVectorIvf
+      constructor: XVectorIvfflat
       base-args: ["@metric"]
       run-groups:
         xvector:
-          args: [[100, 200, 400, 1000, 2000, 400]]
+          args: [[100, 200, 400, 1000, 2000, 4000]]
           query-args: [[1, 2, 4, 10, 20, 40, 100]]
           # args: [[100, 200, 400, 1000, 2000, 4000]]
           # query-args: [[10, 20, 40, 100, 200, 400, 1000]]
@@ -676,46 +707,18 @@ float:
       constructor: XVector
       base-args: ["@metric"]
       run-groups:
-        M-6:
-          arg-groups:
-            - {"M": 6,  "efConstruction": 300}
-          query-args: [[10, 20, 30, 40, 50]]
-        M-8:
-          arg-groups:
-            - {"M": 8,  "efConstruction": 300}
-          query-args: [[10, 20, 30, 40, 50]]
         M-10:
           arg-groups:
-            - {"M": 10,  "efConstruction": 300}
-          query-args: [[10, 20, 30, 40, 50, 100, 150, 200, 300]]
-        M-15:
-          arg-groups:
-            - {"M": 15,  "efConstruction": 300}
-          query-args: [[10, 20, 30, 40, 50, 80, 100, 150, 200]]
-        M-20:
-          arg-groups:
-            - {"M": 20,  "efConstruction": 300}
-          query-args: [[10, 20, 30, 40, 50, 80, 100, 150, 200]]
-        M-25:
-          arg-groups:
-            - {"M": 25,  "efConstruction": 300}
-          query-args: [[10, 20, 30, 40, 50, 80, 100, 150, 200]]
+            - {"M": 10,  "efConstruction": 30}
+          query-args: [[10, 50, 100]]
         M-30:
           arg-groups:
-            - {"M": 30,  "efConstruction": 300}
-          query-args: [[10, 20, 30, 40, 50]]
-        M-40:
+            - {"M": 30,  "efConstruction": 50}
+          query-args: [[10, 50, 100]]
+        M-80:
           arg-groups:
-            - {"M": 40,  "efConstruction": 300}
-          query-args: [[10, 20, 30, 40, 50, 100, 150]]
-        M-50:
-          arg-groups:
-            - {"M": 50,  "efConstruction": 300}
-          query-args: [[10, 20, 30, 40, 50, 100, 150]]
-        M-60:
-          arg-groups:
-            - {"M": 60,  "efConstruction": 300}
-          query-args: [[10, 20, 30, 40, 50, 100, 150]]
+            - {"M": 64,  "efConstruction": 80}
+          query-args: [[50, 100, 150]]
 
 
 
